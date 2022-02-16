@@ -4,24 +4,36 @@ grammar Java;
  * Parser Rules
  */
 
-if_     : 'if(' comparison ')';
+if_     : 'if' separator block;
 
-condition   : comparison LOGIC comparison | comparison;
-comparison  : NUMBER COMP condition | NUMBER;
-
-block   : '{' statement '}';
-
-statement   : NUMBER #Value
-            // | WORD  #Word
+condition   : comparison 
+            | comparison LOGIC condition
+            | comparison LOGIC comparison
             ;
 
+comparison  : number COMP number 
+            | number
+            ;
+
+separator   : '(' condition ')';
+block       : '{' statement '}';
+
+statement   : number ';' #Nmb
+            | word ';' #Wrd
+            ;
+
+word        : LETTER+;
+number      : DIGIT+;
 /*
  * Lexer Rules
  */
 
+LETTER      : 'A'..'Z'
+            | 'a'..'z'
+            | '_'
+            ;
+DIGIT       : ('0'..'9');
 
-// WORD        : '[Aa-Zz]*';
-NUMBER       : '[0-9]+';
 COMP        : '=='  
             | '!='  
             | '<='  
@@ -29,9 +41,11 @@ COMP        : '=='
             | '>='  
             | '>'   
             ;
+
 LOGIC       : '||'
             | '|'
             | '&&'
             | '&'
             ;
-WHITESPACE  : (' '|'t') -> skip;
+
+WHITESPACE  : (' '|'\t'|'\r'|'\n') -> skip;
